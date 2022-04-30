@@ -26,7 +26,7 @@ async function responseErrorIntercept(error) {
   const originalReq = error.config;
 
   // Check status code and retry flag
-  if (error.response && error.response.status === 401 && !originalReq._retry) {
+  if (error?.response?.status === 401 && !originalReq?._retry) {
     originalReq._retry = true;
 
     try {
@@ -51,10 +51,13 @@ async function responseErrorIntercept(error) {
 }
 
 /*  ############# Axios Request Interceptor ############# */
-axios_instance.interceptors.request.use(config => {
-  config.headers['access_token'] = access_token;
-  return config;
-});
+axios_instance.interceptors.request.use(
+  config => {
+    config.headers['access_token'] = access_token;
+    return config;
+  },
+  error => Promise.reject(error)
+);
 
 /*  ############# Axios Response Interceptor ############# */
 axios_instance.interceptors.response.use(responseSuccessIntercept, responseErrorIntercept);
